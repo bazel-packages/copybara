@@ -28,7 +28,7 @@ public class BuildifierOptions implements Option{
   @Parameter(names = "--buildifier-bin",
       description = "Binary to use for buildifier (Default is /usr/bin/buildifier)",
       hidden = true)
-  public String buildifierBin = "/usr/bin/buildifier";
+  public String buildifierBin = "/Users/yannic/Developer/Go/bin/buildifier";
 
   @Parameter(names = "--buildifier-batch-size",
       description = "Process files in batches this size")
