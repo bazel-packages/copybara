@@ -54,6 +54,7 @@ import com.google.copybara.util.Glob;
 import com.google.copybara.util.Identity;
 import com.google.copybara.util.console.Console;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
 
@@ -64,6 +65,7 @@ public class GitHubPrDestination implements Destination<GitRevision> {
 
   private final String url;
   private final String destinationRef;
+  private final Optional<String> prDestinationUrl;
   private final String prBranch;
   private final GeneralOptions generalOptions;
   private final GitHubOptions gitHubOptions;
@@ -82,6 +84,7 @@ public class GitHubPrDestination implements Destination<GitRevision> {
   GitHubPrDestination(
       String url,
       String destinationRef,
+      Optional<String> prDestinationUrl,
       @Nullable String prBranch,
       GeneralOptions generalOptions,
       GitHubOptions gitHubOptions,
@@ -97,6 +100,7 @@ public class GitHubPrDestination implements Destination<GitRevision> {
       boolean updateDescription) {
     this.url = Preconditions.checkNotNull(url);
     this.destinationRef = Preconditions.checkNotNull(destinationRef);
+    this.prDestinationUrl = Preconditions.checkNotNull(prDestinationUrl);
     this.prBranch = prBranch;
     this.generalOptions = Preconditions.checkNotNull(generalOptions);
     this.gitHubOptions = Preconditions.checkNotNull(gitHubOptions);
@@ -275,7 +279,7 @@ public class GitHubPrDestination implements Destination<GitRevision> {
 
   @VisibleForTesting
   String getProjectName() throws ValidationException {
-    return GitHubUtil.getProjectNameFromUrl(url);
+    return GitHubUtil.getProjectNameFromUrl(prDestinationUrl.orElse(url));
   }
 
   @VisibleForTesting
