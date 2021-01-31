@@ -27,6 +27,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.SetMultimap;
+import com.google.common.html.HtmlEscapers;
 import com.google.copybara.doc.annotations.DocDefault;
 import com.google.copybara.doc.annotations.DocDefaults;
 import com.google.copybara.doc.annotations.DocElement;
@@ -38,6 +39,8 @@ import com.google.devtools.build.lib.skylarkinterface.Param;
 import com.google.devtools.build.lib.skylarkinterface.SkylarkCallable;
 import com.google.devtools.build.lib.skylarkinterface.SkylarkGlobalLibrary;
 import com.google.devtools.build.lib.skylarkinterface.SkylarkModule;
+import com.google.re2j.Matcher;
+import com.google.re2j.Pattern;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
@@ -397,11 +400,15 @@ public class MarkdownGenerator extends BasicAnnotationProcessor {
 
   private String simplerJavaTypes(TypeMirror typeMirror) {
     String s = typeMirror.toString();
-    int dot = s.lastIndexOf('.');
-    if (dot == -1) {
-      return deCapitalize(s);
+    Matcher m = Pattern.compile("(?:[A-z.]*\\.)*([A-z]+)").matcher(s);
+    StringBuilder sb = new StringBuilder();
+    while(m.find()) {
+      String replacement = deCapitalize(m.group(1));
+      m.appendReplacement(sb, replacement);
     }
-    return deCapitalize(s.substring(dot + 1));
+    m.appendTail(sb);
+
+    return HtmlEscapers.htmlEscaper().escape(sb.toString());
   }
 
   private void tableHeader(StringBuilder sb, String... fields) {
@@ -495,7 +502,7 @@ public class MarkdownGenerator extends BasicAnnotationProcessor {
      * Don't wrap this text. Also use '`' to show it as code.
      */
     private String nowrap(String text) {
-      return String.format("<nobr>`%s`</nobr>", text);
+      return String.format("<span style=\"white-space: nowrap;\">`%s`</span>", text);
     }
   }
 

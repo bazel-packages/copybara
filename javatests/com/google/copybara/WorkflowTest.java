@@ -324,7 +324,7 @@ public class WorkflowTest {
   public void testTestWorkflowWithDiffInOrigin() throws Exception {
     GitRepository remote = GitRepository.newBareRepo(
         Files.createTempDirectory("gitdir"), getGitEnv(), /*verbose=*/true,
-            DEFAULT_TIMEOUT).withWorkTree(workdir);
+            DEFAULT_TIMEOUT, /*noVerify=*/ false).withWorkTree(workdir);
     remote.init();
 
     Files.write(workdir.resolve("foo.txt"), new byte[]{});
@@ -365,7 +365,7 @@ public class WorkflowTest {
   public void testTestWorkflowWithDiffInOriginAndRespondNo() throws Exception {
     GitRepository remote = GitRepository.newBareRepo(
         Files.createTempDirectory("gitdir"), getGitEnv(), /*verbose=*/true,
-        DEFAULT_TIMEOUT).withWorkTree(workdir);
+        DEFAULT_TIMEOUT, /*noVerify=*/ false).withWorkTree(workdir);
     remote.init();
 
     Files.write(workdir.resolve("foo.txt"), new byte[]{});
@@ -1557,7 +1557,7 @@ public class WorkflowTest {
     Path destinationPath = Files.createTempDirectory("destination");
     GitRepository origin = GitRepository.newRepo(/*verbose*/ true, originPath, getGitEnv()).init();
     GitRepository destination = GitRepository.newBareRepo(destinationPath, getGitEnv(),
-        /*verbose=*/true, DEFAULT_TIMEOUT).init();
+        /*verbose=*/true, DEFAULT_TIMEOUT, /*noVerify=*/ false).init();
 
     String config = "core.workflow("
         + "    name = 'default',\n"
@@ -1573,7 +1573,7 @@ public class WorkflowTest {
         + ")\n";
 
     addGitFile(originPath, origin, "foo.txt", "not important");
-    commit(origin, "baseline");
+    commit(origin, "baseline\n\nOrigin-Label: 1234567");
 
     options.setWorkdirToRealTempDir();
     // Pass custom HOME directory so that we run an hermetic test and we
@@ -1605,6 +1605,9 @@ public class WorkflowTest {
     assertThat(e)
         .hasMessageThat()
         .contains("Migration of the revision resulted in an empty change");
+    assertThat(e)
+        .hasMessageThat()
+        .contains(destination.parseRef("HEAD"));
   }
 
   private void checkChangeRequest_sot_ahead_sot()
@@ -1798,7 +1801,7 @@ public class WorkflowTest {
         assertThrows(ValidationException.class, () -> checkChangeRequestSmartPrune());
     assertThat(e)
         .hasMessageThat()
-        .contains("smart_prune is not compatible with --change_request_parent");
+        .contains("smart_prune is not compatible with --change-request-parent");
   }
 
   private ImmutableList<DiffFile> checkChangeRequestSmartPrune()
@@ -2933,7 +2936,7 @@ public class WorkflowTest {
 
     Path destinationPath = Files.createTempDirectory("destination");
     GitRepository destRepo = GitRepository
-        .newBareRepo(destinationPath, getGitEnv(), true, DEFAULT_TIMEOUT)
+        .newBareRepo(destinationPath, getGitEnv(), true, DEFAULT_TIMEOUT, /*noVerify=*/ false)
         .init();
 
     String config = "core.workflow("
@@ -3165,7 +3168,8 @@ public class WorkflowTest {
             Files.createTempDirectory("destination"),
             getGitEnv(),
             /*verbose=*/ true,
-            DEFAULT_TIMEOUT);
+            DEFAULT_TIMEOUT,
+            /*noVerify=*/ false);
     destinationBare.init();
     GitRepository destination = destinationBare.withWorkTree(destinationWorkdir);
 

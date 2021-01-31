@@ -12,5 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-bazel_version = "20c276801ee66a73b73facd5c75ae8b38eabb00d"
-bazel_sha256 = "99e5c7609b53c3a03645558ce8fada760a05dc6ed2227d26a2245ee3a27a4483"
+bazel_version = "171790a605bc2cbd1a2772de4e2f7b1d0fe52afa"
+bazel_sha256 = "cb9d1ac084c545b8389ae7986fa89c09bd43f72276e1fde4da38c9c4168860b6"
